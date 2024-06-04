@@ -36,7 +36,7 @@ public class UserController {
 		return "The server is up an running";
 	}
 	
-	@PostMapping(path="/add") // Map ONLY POST Requests
+	@PostMapping(path="/users/add") // Map ONLY POST Requests
 	  public @ResponseBody String addNewUser (@RequestParam String name
 	      , @RequestParam String email) {
 	    // @ResponseBody means the returned String is the response, not a view name
@@ -49,13 +49,13 @@ public class UserController {
 	    return "Saved";
 	  }
 	
-	@GetMapping(path="/all")
+	@GetMapping(path="/users/all")
 	  public @ResponseBody Iterable<User> getAllUsers() {
 	    // This returns a JSON or XML with the users
 	    return userRepository.findAll();
 	  }
 	
-	@DeleteMapping(path="/delete/{id}")
+	@DeleteMapping(path="users/delete/{id}")
 	public @ResponseBody String deleteUser(@PathVariable("id") Integer id) {
 	    if (userRepository.existsById(id)) {
 	        userRepository.deleteById(id);
@@ -65,7 +65,7 @@ public class UserController {
 	    }
 	}
 	
-	@PutMapping(path="/update/{id}")
+	@PutMapping(path="users/update/{id}")
 	public @ResponseBody String updateUser(@PathVariable("id") Integer id, @RequestBody User updatedUser) {
 	    return userRepository.findById(id)
 	        .map(user -> {
