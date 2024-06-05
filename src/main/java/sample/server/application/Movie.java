@@ -3,13 +3,14 @@ package sample.server.application;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import sample.server.controller.ActorRepository;
+import sample.server.controller.DirectorRepository;
+import sample.server.controller.GenreRepository;
 
 import java.time.LocalDateTime;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
+import java.util.Objects;
 
-@Service
 @Entity
 public class Movie {
     @Id
@@ -112,4 +113,17 @@ public class Movie {
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
+
+    public Integer getDirectorId() {
+        return director != null ? director.getId() : null;
+    }
+
+    public Integer getActorId() {
+        return actor != null ? actor.getId() : null;
+    }
+
+    public Integer getGenreId() {
+        return genre != null ? genre.getId() : null;
+    }
+
 }

@@ -1,12 +1,16 @@
 package sample.server.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import sample.server.application.Actor;
+
+import java.util.Optional;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.info.Info;
-import sample.server.application.Actor;
 
 @OpenAPIDefinition(
         info = @Info(
@@ -52,19 +56,38 @@ public class ActorController {
     }
 
     @PutMapping(path="/actors/update/{id}")
-    public @ResponseBody String updateActor(@PathVariable("id") Integer id, @RequestBody Actor updatedActor) {
+    public @ResponseBody String updateActor(
+            @PathVariable("id") Integer id,
+            @RequestParam("name") String name,
+            @RequestParam("gender") String gender
+    ) {
         return actorRepository.findById(id)
                 .map(actor -> {
-                    actor.setName(updatedActor.getName());
-                    actor.setGender(updatedActor.getGender());
+                    actor.setName(name);
+                    actor.setGender(gender);
                     actorRepository.save(actor);
                     return "Updated actor with id " + id;
                 })
                 .orElseGet(() -> {
                     // Optionally add a new actor if not found
+                    Actor updatedActor = new Actor();
                     updatedActor.setId(id);
+                    updatedActor.setName(name);
+                    updatedActor.setGender(gender);
                     actorRepository.save(updatedActor);
                     return "Created new actor with id " + id;
                 });
+    }
+
+    @GetMapping("/actors/{id}")
+    public ResponseEntity<String> getActorById(@PathVariable("id") Integer id) {
+        Optional<Actor> actorOptional = actorRepository.findById(id);
+        if (actorOptional.isPresent()) {
+            Actor actor = actorOptional.get();
+            String actorDetails = "ID: " + actor.getId() + ", Name: " + actor.getName() + ", Gender: " + actor.getGender();
+            return ResponseEntity.ok(actorDetails);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Actor not found with id " + id);
+        }
     }
 }
