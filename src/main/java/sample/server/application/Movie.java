@@ -1,5 +1,6 @@
 package sample.server.application;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -34,6 +35,7 @@ public class Movie {
     private Genre genre;
 
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL)
+    @JsonBackReference
     private List<UserWatchHistory> watchHistory;
 
     private String name;

@@ -1,5 +1,7 @@
 package sample.server.application;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -19,10 +21,12 @@ public class UserWatchHistory
 
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
+    @JsonManagedReference
     private User user;
 
     @ManyToOne
     @JoinColumn(name = "movie_id", referencedColumnName = "id")
+    @JsonManagedReference
     private Movie movie;
 
     @CreationTimestamp
