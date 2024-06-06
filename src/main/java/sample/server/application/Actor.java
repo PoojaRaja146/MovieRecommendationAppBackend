@@ -1,5 +1,6 @@
 package sample.server.application;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import org.springframework.stereotype.Service;
 import org.hibernate.annotations.CreationTimestamp;
@@ -20,6 +21,7 @@ public class Actor {
     private String gender;
 
     @OneToMany(mappedBy = "actor", cascade = CascadeType.ALL)
+    @JsonBackReference
     private List<Movie> movies;
 
     @CreationTimestamp

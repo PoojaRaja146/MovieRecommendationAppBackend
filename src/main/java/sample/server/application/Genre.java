@@ -1,5 +1,6 @@
 package sample.server.application;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -20,6 +21,7 @@ public class Genre {
     private String name;
 
     @OneToMany(mappedBy = "genre", cascade = CascadeType.ALL)
+    @JsonBackReference
     private List<Movie> movies;
 
     @CreationTimestamp

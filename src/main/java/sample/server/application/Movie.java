@@ -1,5 +1,6 @@
 package sample.server.application;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -19,14 +20,17 @@ public class Movie {
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "directorId", referencedColumnName = "id")
+    @JsonManagedReference
     private Director director;
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "actorId", referencedColumnName = "id")
+    @JsonManagedReference
     private Actor actor;
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "genreId", referencedColumnName = "id")
+    @JsonManagedReference
     private Genre genre;
 
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL)
