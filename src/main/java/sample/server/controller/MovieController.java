@@ -9,7 +9,9 @@ import sample.server.application.Director;
 import sample.server.application.Genre;
 import sample.server.application.Movie;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
@@ -102,7 +104,7 @@ public class MovieController {
             response.append("\n");
         }
 
-        if (response.length() > 0) {
+        if (response.isEmpty()) {
             return ResponseEntity.ok(response.toString());
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No movies found");
@@ -192,4 +194,47 @@ public class MovieController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Movie not found with id " + id);
         }
     }
+
+    @GetMapping("/genres/{genreId}/movies")
+    public ResponseEntity<String> getMoviesByGenreId(@PathVariable("genreId") Integer genreId) {
+        List<Movie> movies = movieRepository.findByGenre_Id(genreId);
+        if (movies.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No movies found for genre with id " + genreId);
+        } else {
+            String movieDetails = movies.stream()
+                    .map(movie -> {
+                        String details = "ID: " + movie.getId() + ", Name: " + movie.getName() + ", Language: " + movie.getLanguage();
+
+                        // Add director details
+                        if (movie.getDirector() != null) {
+                            details += ", Director: " + movie.getDirector().getName();
+                        } else {
+                            details += ", Director: N/A";
+                        }
+
+                        // Add actor details
+                        if (movie.getActor() != null) {
+                            details += ", Actor: " + movie.getActor().getName();
+                        } else {
+                            details += ", Actor: N/A";
+                        }
+
+                        // Add genre details
+                        if (movie.getGenre() != null) {
+                            details += ", Genre: " + movie.getGenre().getName();
+                        } else {
+                            details += ", Genre: N/A";
+                        }
+
+                        return details;
+                    })
+                    .collect(Collectors.joining("\n"));
+
+            return ResponseEntity.ok(movieDetails);
+        }
+    }
 }
+
+
+
+
