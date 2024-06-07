@@ -233,6 +233,85 @@ public class MovieController {
             return ResponseEntity.ok(movieDetails);
         }
     }
+
+    @GetMapping("/directors/{directorId}/movies")
+    public ResponseEntity<String> getMoviesByDirectorId(@PathVariable("directorId") Integer directorId) {
+        List<Movie> movies = movieRepository.findByDirector_Id(directorId);
+        if (movies.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No movies found for director with id " + directorId);
+        } else {
+            String movieDetails = movies.stream()
+                    .map(movie -> {
+                        String details = "ID: " + movie.getId() + ", Name: " + movie.getName() + ", Language: " + movie.getLanguage();
+
+                        // Add director details
+                        if (movie.getDirector() != null) {
+                            details += ", Director: " + movie.getDirector().getName();
+                        } else {
+                            details += ", Director: N/A";
+                        }
+
+                        // Add actor details
+                        if (movie.getActor() != null) {
+                            details += ", Actor: " + movie.getActor().getName();
+                        } else {
+                            details += ", Actor: N/A";
+                        }
+
+                        // Add genre details
+                        if (movie.getGenre() != null) {
+                            details += ", Genre: " + movie.getGenre().getName();
+                        } else {
+                            details += ", Genre: N/A";
+                        }
+
+                        return details;
+                    })
+                    .collect(Collectors.joining("\n"));
+
+            return ResponseEntity.ok(movieDetails);
+        }
+    }
+
+    @GetMapping("/actors/{actorId}/movies")
+    public ResponseEntity<String> getMoviesByActorId(@PathVariable("actorId") Integer actorId) {
+        List<Movie> movies = movieRepository.findByActor_Id(actorId);
+        if (movies.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No movies found for actor with id " + actorId);
+        } else {
+            String movieDetails = movies.stream()
+                    .map(movie -> {
+                        String details = "ID: " + movie.getId() + ", Name: " + movie.getName() + ", Language: " + movie.getLanguage();
+
+                        // Add director details
+                        if (movie.getDirector() != null) {
+                            details += ", Director: " + movie.getDirector().getName();
+                        } else {
+                            details += ", Director: N/A";
+                        }
+
+                        // Add actor details
+                        if (movie.getActor() != null) {
+                            details += ", Actor: " + movie.getActor().getName();
+                        } else {
+                            details += ", Actor: N/A";
+                        }
+
+                        // Add genre details
+                        if (movie.getGenre() != null) {
+                            details += ", Genre: " + movie.getGenre().getName();
+                        } else {
+                            details += ", Genre: N/A";
+                        }
+
+                        return details;
+                    })
+                    .collect(Collectors.joining("\n"));
+
+            return ResponseEntity.ok(movieDetails);
+        }
+    }
+
 }
 
 
