@@ -1,4 +1,4 @@
-CREATE TABLE movie_audit (
+CREATE TABLE IF NOT EXISTS movie_audit (
                              id INT AUTO_INCREMENT PRIMARY KEY,
                              movie_id INT NOT NULL,
                              operation VARCHAR(10) NOT NULL,

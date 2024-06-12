@@ -1,5 +1,5 @@
 -- Create the director_audit table
-CREATE TABLE director_audit (
+CREATE TABLE IF NOT EXISTS director_audit (
                                 director_id INT NOT NULL,
                                 operation VARCHAR(10) NOT NULL,
                                 operation_time DATETIME NOT NULL,

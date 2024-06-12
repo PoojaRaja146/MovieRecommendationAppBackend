@@ -1,5 +1,5 @@
 -- Create the genre_audit table
-CREATE TABLE genre_audit (
+CREATE TABLE IF NOT EXISTS genre_audit (
                              genre_id INT NOT NULL,
                              operation VARCHAR(10) NOT NULL,
                              operation_time DATETIME NOT NULL,

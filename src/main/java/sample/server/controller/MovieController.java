@@ -17,6 +17,9 @@ import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.info.Info;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @OpenAPIDefinition(
         info = @Info(
                 title = "Movie Service",
@@ -26,6 +29,8 @@ import io.swagger.v3.oas.annotations.info.Info;
 )
 @RestController
 public class MovieController {
+
+    private static final Logger logger = LoggerFactory.getLogger(MovieController.class);
 
     @Autowired
     private MovieRepository movieRepository;
@@ -104,7 +109,8 @@ public class MovieController {
             response.append("\n");
         }
 
-        if (response.isEmpty()) {
+        if (!response.isEmpty()) {
+            logger.info("Movies found: {}", response.toString()); // Log the movies found
             return ResponseEntity.ok(response.toString());
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No movies found");

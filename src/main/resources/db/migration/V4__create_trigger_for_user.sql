@@ -1,5 +1,5 @@
 -- Create the user_audit table
-CREATE TABLE user_audit (
+CREATE TABLE IF NOT EXISTS user_audit (
                             user_id INT NOT NULL,
                             operation VARCHAR(10) NOT NULL,
                             operation_time DATETIME NOT NULL,

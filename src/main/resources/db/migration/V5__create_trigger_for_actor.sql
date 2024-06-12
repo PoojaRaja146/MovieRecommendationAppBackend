@@ -1,5 +1,5 @@
 -- Create the actor_audit table
-CREATE TABLE actor_audit (
+CREATE TABLE IF NOT EXISTS actor_audit (
                              actor_id INT NOT NULL,
                              operation VARCHAR(10) NOT NULL,
                              operation_time DATETIME NOT NULL,

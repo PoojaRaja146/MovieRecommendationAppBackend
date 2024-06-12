@@ -13,6 +13,7 @@ import java.util.Optional;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.info.Info;
+import org.springframework.transaction.annotation.Transactional;
 
 @OpenAPIDefinition(
         info = @Info(
@@ -39,6 +40,7 @@ public class UserWatchHistoryController {
         return "User Watch History service is up and running";
     }
 
+    @Transactional
     @PostMapping(path="/watch-history/add")
     public ResponseEntity<String> addNewUserWatchHistory(@RequestParam Integer rating,
                                                          @RequestParam Integer userId,
