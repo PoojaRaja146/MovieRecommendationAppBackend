@@ -2,6 +2,9 @@ package sample.server.application;
 
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -19,8 +22,12 @@ public class User {
 
   private String lastName;
 
+  @NotBlank(message = "Email is mandatory")
+  @Email(message = "Email should be valid")
   private String email;
 
+  @NotBlank(message = "Phone number is mandatory")
+  @Pattern(regexp = "^\\+?[0-9. ()-]{7,25}$", message = "Phone number is invalid")
   private String phoneNo;
 
   @CreationTimestamp

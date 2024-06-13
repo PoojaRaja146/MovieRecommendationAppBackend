@@ -2,6 +2,8 @@ package sample.server.application;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -22,6 +24,8 @@ public class Director {
 
     private String lastName;
 
+    @NotBlank(message = "Gender is mandatory")
+    @Pattern(regexp = "^(M|F|other)$", message = "Gender must be M, F, or other")
     private String gender;
 
     @OneToMany(mappedBy = "director")
