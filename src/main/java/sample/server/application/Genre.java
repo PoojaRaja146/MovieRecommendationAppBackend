@@ -20,7 +20,7 @@ public class Genre {
 
     private String name;
 
-    @OneToMany(mappedBy = "genre", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "genre")
     @JsonBackReference
     private List<Movie> movies;
 

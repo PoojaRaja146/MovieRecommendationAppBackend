@@ -28,9 +28,6 @@ public class User {
 
   @UpdateTimestamp
   private LocalDateTime updatedAt;
-  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-  @JsonBackReference
-  private List<UserWatchHistory> watchHistory;
 
   public Integer getId() {
     return id;
@@ -72,11 +69,4 @@ public class User {
     this.updatedAt = updatedAt;
   }
 
-  public List<UserWatchHistory> getWatchHistory() {
-    return watchHistory;
-  }
-
-  public void setWatchHistory(List<UserWatchHistory> watchHistory) {
-    this.watchHistory = watchHistory;
-  }
 }

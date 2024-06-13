@@ -20,7 +20,7 @@ public class Actor {
 
     private String gender;
 
-    @OneToMany(mappedBy = "actor", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "actor")
     @JsonBackReference
     private List<Movie> movies;
 

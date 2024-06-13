@@ -1,17 +1,11 @@
 package sample.server.application;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import sample.server.controller.ActorRepository;
-import sample.server.controller.DirectorRepository;
-import sample.server.controller.GenreRepository;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Objects;
 
 @Entity
 public class Movie {
@@ -19,24 +13,23 @@ public class Movie {
     @GeneratedValue(strategy= GenerationType.AUTO)
     private int id;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "directorId", referencedColumnName = "id")
     @JsonManagedReference
     private Director director;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "actorId", referencedColumnName = "id")
     @JsonManagedReference
     private Actor actor;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "genreId", referencedColumnName = "id")
     @JsonManagedReference
     private Genre genre;
 
-    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL)
-    @JsonBackReference
-    private List<UserWatchHistory> watchHistory;
+    @OneToOne(mappedBy = "movie", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
+    private MovieMetaInfo metaInfo;
 
     private String name;
 
@@ -78,14 +71,6 @@ public class Movie {
 
     public void setGenre(Genre genre) {
         this.genre = genre;
-    }
-
-    public List<UserWatchHistory> getWatchHistory() {
-        return watchHistory;
-    }
-
-    public void setWatchHistory(List<UserWatchHistory> watchHistory) {
-        this.watchHistory = watchHistory;
     }
 
     public String getName() {
@@ -132,4 +117,11 @@ public class Movie {
         return genre != null ? genre.getId() : null;
     }
 
+    public MovieMetaInfo getMetaInfo() {
+        return this.metaInfo;
+    }
+
+    public void setMetaInfo(MovieMetaInfo metaInfo) {
+        this.metaInfo = metaInfo;
+    }
 }

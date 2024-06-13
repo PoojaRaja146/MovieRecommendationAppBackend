@@ -1,13 +1,13 @@
 package sample.server.controller;
 
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.ValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-import sample.server.application.Actor;
-import sample.server.application.Director;
-import sample.server.application.Genre;
-import sample.server.application.Movie;
+import sample.server.application.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -44,137 +44,23 @@ public class MovieController {
     @Autowired
     private GenreRepository genreRepository;
 
+    @Autowired
+    private MovieMetaInfoRepository movieMetaInfoRepository;
+
     @Operation(summary = "Status message", description = "Returns a status message.")
     @GetMapping(path="/movies", produces = "text/plain")
     public String status() {
         return "Movie service is up and running";
     }
 
-    @PostMapping(path="/movies/add")
+    @Transactional
+    @PostMapping(path = "/movies/add")
     public ResponseEntity<String> addNewMovie(@RequestParam String name, @RequestParam String language,
                                               @RequestParam Integer directorId, @RequestParam Integer actorId,
-                                              @RequestParam Integer genreId) {
-        // Fetch the related entities using repositories
-        Director director = directorRepository.findById(directorId)
-                .orElseThrow(() -> new IllegalArgumentException("Director with ID " + directorId + " does not exist."));
+                                              @RequestParam Integer genreId, @RequestParam String summary,
+                                              @RequestParam String rating) {
 
-        Actor actor = actorRepository.findById(actorId)
-                .orElseThrow(() -> new IllegalArgumentException("Actor with ID " + actorId + " does not exist."));
-
-        Genre genre = genreRepository.findById(genreId)
-                .orElseThrow(() -> new IllegalArgumentException("Genre with ID " + genreId + " does not exist."));
-
-        // Create the movie object and set its properties
-        Movie movie = new Movie();
-        movie.setName(name);
-        movie.setLanguage(language);
-        movie.setDirector(director);
-        movie.setActor(actor);
-        movie.setGenre(genre);
-
-        // Save the movie object
-        movieRepository.save(movie);
-
-        return ResponseEntity.ok("Saved");
-    }
-
-    @GetMapping(path="/movies/all")
-    public ResponseEntity<String> getAllMovies() {
-        Iterable<Movie> allMovies = movieRepository.findAll();
-        StringBuilder response = new StringBuilder();
-
-        for (Movie movie : allMovies) {
-            response.append("ID: ").append(movie.getId())
-                    .append(", Name: ").append(movie.getName())
-                    .append(", Language: ").append(movie.getLanguage());
-
-            if (movie.getDirector() != null) {
-                response.append(", Director: ").append(movie.getDirector().getName());
-            } else {
-                response.append(", Director: N/A");
-            }
-
-            if (movie.getActor() != null) {
-                response.append(", Actor: ").append(movie.getActor().getName());
-            } else {
-                response.append(", Actor: N/A");
-            }
-
-            if (movie.getGenre() != null) {
-                response.append(", Genre: ").append(movie.getGenre().getName());
-            } else {
-                response.append(", Genre: N/A");
-            }
-
-            response.append("\n");
-        }
-
-        if (!response.isEmpty()) {
-            logger.info("Movies found: {}", response.toString()); // Log the movies found
-            return ResponseEntity.ok(response.toString());
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No movies found");
-        }
-    }
-
-    @DeleteMapping(path="/movies/delete/{id}")
-    public ResponseEntity<String> deleteMovie(@PathVariable("id") Integer id) {
-        if (movieRepository.existsById(id)) {
-            movieRepository.deleteById(id);
-            return ResponseEntity.ok("Deleted movie with id " + id);
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Movie not found with id " + id);
-        }
-    }
-
-    @GetMapping("/movies/{id}")
-    public ResponseEntity<String> getMovieById(@PathVariable("id") Integer id) {
-        Optional<Movie> movieOptional = movieRepository.findById(id);
-        if (movieOptional.isPresent()) {
-            Movie movie = movieOptional.get();
-            String movieDetails = "ID: " + movie.getId() + ", Name: " + movie.getName() + ", Language: " + movie.getLanguage();
-
-            // Add director details
-            if (movie.getDirector() != null) {
-                movieDetails += ", Director: " + movie.getDirector().getName();
-            } else {
-                movieDetails += ", Director: N/A";
-            }
-
-            // Add actor details
-            if (movie.getActor() != null) {
-                movieDetails += ", Actor: " + movie.getActor().getName();
-            } else {
-                movieDetails += ", Actor: N/A";
-            }
-
-            // Add genre details
-            if (movie.getGenre() != null) {
-                movieDetails += ", Genre: " + movie.getGenre().getName();
-            } else {
-                movieDetails += ", Genre: N/A";
-            }
-
-            return ResponseEntity.ok(movieDetails);
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Movie not found with id " + id);
-        }
-    }
-
-    @PutMapping(path="/movies/update/{id}")
-    public ResponseEntity<String> updateMovie(
-            @PathVariable("id") Integer id,
-            @RequestParam("name") String name,
-            @RequestParam("language") String language,
-            @RequestParam("directorId") Integer directorId,
-            @RequestParam("actorId") Integer actorId,
-            @RequestParam("genreId") Integer genreId
-    ) {
-        // Fetch the movie from the database
-        Optional<Movie> optionalMovie = movieRepository.findById(id);
-        if (optionalMovie.isPresent()) {
-            Movie movie = optionalMovie.get();
-
+        try {
             // Fetch the related entities using repositories
             Director director = directorRepository.findById(directorId)
                     .orElseThrow(() -> new IllegalArgumentException("Director with ID " + directorId + " does not exist."));
@@ -185,19 +71,184 @@ public class MovieController {
             Genre genre = genreRepository.findById(genreId)
                     .orElseThrow(() -> new IllegalArgumentException("Genre with ID " + genreId + " does not exist."));
 
-            // Update the movie object with new values
+            // Create the movie object and set its properties
+            Movie movie = new Movie();
             movie.setName(name);
             movie.setLanguage(language);
             movie.setDirector(director);
             movie.setActor(actor);
             movie.setGenre(genre);
-
-            // Save the updated movie object
             movieRepository.save(movie);
 
-            return ResponseEntity.ok("Updated movie with id " + id);
+            // Create the meta info object and set its properties
+            MovieMetaInfo metaInfo = new MovieMetaInfo();
+            metaInfo.setSummary(summary);
+            metaInfo.setRating(rating);
+            metaInfo.setMovie(movie);
+
+            movieMetaInfoRepository.save(metaInfo);
+
+            // Log and return success response
+            logger.info("Movie added successfully: {}", movie);
+            return ResponseEntity.ok("Saved");
+
+        } catch (Exception e) {
+            // Handle general exceptions
+            logger.error("Error adding movie: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error adding movie");
+        }
+    }
+
+    @PostMapping(path = "/movies/add-without-transaction")
+    public ResponseEntity<String> addNewMovieWithoutTransaction(@RequestParam String name, @RequestParam String language,
+                                                                @RequestParam Integer directorId, @RequestParam Integer actorId,
+                                                                @RequestParam Integer genreId, @RequestParam String summary,
+                                                                @RequestParam String rating) {
+        try {
+            // Fetch the related entities using repositories
+            Director director = directorRepository.findById(directorId)
+                    .orElseThrow(() -> new IllegalArgumentException("Director with ID " + directorId + " does not exist."));
+
+            Actor actor = actorRepository.findById(actorId)
+                    .orElseThrow(() -> new IllegalArgumentException("Actor with ID " + actorId + " does not exist."));
+
+            Genre genre = genreRepository.findById(genreId)
+                    .orElseThrow(() -> new IllegalArgumentException("Genre with ID " + genreId + " does not exist."));
+
+            // Create the movie object and save it
+            Movie movie = new Movie();
+            movie.setName(name);
+            movie.setLanguage(language);
+            movie.setDirector(director);
+            movie.setActor(actor);
+            movie.setGenre(genre);
+            movieRepository.save(movie);
+
+            // Create the meta info object and save it
+            MovieMetaInfo metaInfo = new MovieMetaInfo();
+            metaInfo.setSummary(summary);
+            metaInfo.setRating(rating);
+            metaInfo.setMovie(movie);
+            movieMetaInfoRepository.save(metaInfo);
+
+            // Log and return success response
+            logger.info("Movie added successfully: {}", movie);
+            return ResponseEntity.ok("Saved");
+
+        } catch (Exception e) {
+            // Handle general exceptions
+            logger.error("Error adding movie: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error adding movie");
+        }
+    }
+
+    @GetMapping(path="/movies/all")
+    @Transactional // Ensure lazy loading works outside of transactional boundaries
+    public ResponseEntity<List<Movie>> getAllMovies() {
+        List<Movie> allMovies = (List<Movie>) movieRepository.findAll();
+        if (!allMovies.isEmpty()) {
+            for (Movie movie : allMovies) {
+                // Force loading of metaInfo if it's lazily initialized
+                movie.getMetaInfo();
+            }
+            logger.info("Movies found: {}", allMovies);
+            return ResponseEntity.ok(allMovies);
         } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Movie not found with id " + id);
+            logger.info("No movies found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+    }
+
+    @Transactional
+    @DeleteMapping(path = "movies/delete/{id}")
+    public ResponseEntity<String> deleteMovie(@PathVariable("id") Integer id) {
+        try {
+            if (movieRepository.existsById(id)) {
+                movieRepository.deleteById(id);
+                logger.info("Deleted movie with id {}", id);
+                return ResponseEntity.ok("Deleted movie with id " + id);
+            } else {
+                logger.info("Movie not found with id {}", id);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Movie not found with id " + id);
+            }
+        } catch (Exception e) {
+            logger.error("Error deleting movie with id {}: ", id, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error deleting movie");
+        }
+    }
+
+    @GetMapping("/movies/{id}")
+    @Transactional
+    public ResponseEntity<Movie> getMovieById(@PathVariable("id") Integer id) {
+        Optional<Movie> movieOptional = movieRepository.findById(id);
+        if (movieOptional.isPresent()) {
+            Movie movie = movieOptional.get();
+            movie.getMetaInfo(); // Force loading of metaInfo
+            logger.info("Movie found with id {}: {}", id, movie);
+            return ResponseEntity.ok(movie);
+        } else {
+            logger.info("Movie not found with id {}", id);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+    }
+
+    @Transactional
+    @PutMapping(path="/movies/update/{id}")
+    public ResponseEntity<String> updateMovie(
+            @PathVariable("id") Integer id,
+            @RequestParam("name") String name,
+            @RequestParam("language") String language,
+            @RequestParam("directorId") Integer directorId,
+            @RequestParam("actorId") Integer actorId,
+            @RequestParam("genreId") Integer genreId,
+            @RequestParam("summary") String summary,
+            @RequestParam("rating") String rating
+    ) {
+        try {
+            Optional<Movie> optionalMovie = movieRepository.findById(id);
+            if (optionalMovie.isPresent()) {
+                Movie movie = optionalMovie.get();
+
+                Director director = directorRepository.findById(directorId)
+                        .orElseThrow(() -> new IllegalArgumentException("Director with ID " + directorId + " does not exist."));
+
+                Actor actor = actorRepository.findById(actorId)
+                        .orElseThrow(() -> new IllegalArgumentException("Actor with ID " + actorId + " does not exist."));
+
+                Genre genre = genreRepository.findById(genreId)
+                        .orElseThrow(() -> new IllegalArgumentException("Genre with ID " + genreId + " does not exist."));
+
+                movie.setName(name);
+                movie.setLanguage(language);
+                movie.setDirector(director);
+                movie.setActor(actor);
+                movie.setGenre(genre);
+
+                // Update the meta info
+                MovieMetaInfo metaInfo = movie.getMetaInfo();
+                if (metaInfo != null) {
+                    metaInfo.setSummary(summary);
+                    metaInfo.setRating(rating);
+                    movieMetaInfoRepository.save(metaInfo);
+                } else {
+                    metaInfo = new MovieMetaInfo();
+                    metaInfo.setSummary(summary);
+                    metaInfo.setRating(rating);
+                    metaInfo.setMovie(movie);
+                    movie.setMetaInfo(metaInfo);
+                    movieMetaInfoRepository.save(metaInfo);
+                }
+
+                movieRepository.save(movie);
+                logger.info("Updated movie with id {}", id);
+                return ResponseEntity.ok("Updated movie with id " + id);
+            } else {
+                logger.info("Movie not found with id {}", id);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Movie not found with id " + id);
+            }
+        } catch (Exception e) {
+            logger.error("Error updating movie with id {}: ", id, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating movie");
         }
     }
 
@@ -205,27 +256,25 @@ public class MovieController {
     public ResponseEntity<String> getMoviesByGenreId(@PathVariable("genreId") Integer genreId) {
         List<Movie> movies = movieRepository.findByGenre_Id(genreId);
         if (movies.isEmpty()) {
+            logger.info("No movies found for genre with id {}", genreId);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No movies found for genre with id " + genreId);
         } else {
             String movieDetails = movies.stream()
                     .map(movie -> {
                         String details = "ID: " + movie.getId() + ", Name: " + movie.getName() + ", Language: " + movie.getLanguage();
 
-                        // Add director details
                         if (movie.getDirector() != null) {
                             details += ", Director: " + movie.getDirector().getName();
                         } else {
                             details += ", Director: N/A";
                         }
 
-                        // Add actor details
                         if (movie.getActor() != null) {
                             details += ", Actor: " + movie.getActor().getName();
                         } else {
                             details += ", Actor: N/A";
                         }
 
-                        // Add genre details
                         if (movie.getGenre() != null) {
                             details += ", Genre: " + movie.getGenre().getName();
                         } else {
@@ -236,6 +285,7 @@ public class MovieController {
                     })
                     .collect(Collectors.joining("\n"));
 
+            logger.info("Movies found for genre with id {}: {}", genreId, movieDetails);
             return ResponseEntity.ok(movieDetails);
         }
     }
@@ -244,27 +294,25 @@ public class MovieController {
     public ResponseEntity<String> getMoviesByDirectorId(@PathVariable("directorId") Integer directorId) {
         List<Movie> movies = movieRepository.findByDirector_Id(directorId);
         if (movies.isEmpty()) {
+            logger.info("No movies found for director with id {}", directorId);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No movies found for director with id " + directorId);
         } else {
             String movieDetails = movies.stream()
                     .map(movie -> {
                         String details = "ID: " + movie.getId() + ", Name: " + movie.getName() + ", Language: " + movie.getLanguage();
 
-                        // Add director details
                         if (movie.getDirector() != null) {
                             details += ", Director: " + movie.getDirector().getName();
                         } else {
                             details += ", Director: N/A";
                         }
 
-                        // Add actor details
                         if (movie.getActor() != null) {
                             details += ", Actor: " + movie.getActor().getName();
                         } else {
                             details += ", Actor: N/A";
                         }
 
-                        // Add genre details
                         if (movie.getGenre() != null) {
                             details += ", Genre: " + movie.getGenre().getName();
                         } else {
@@ -275,6 +323,7 @@ public class MovieController {
                     })
                     .collect(Collectors.joining("\n"));
 
+            logger.info("Movies found for director with id {}: {}", directorId, movieDetails);
             return ResponseEntity.ok(movieDetails);
         }
     }
@@ -283,27 +332,25 @@ public class MovieController {
     public ResponseEntity<String> getMoviesByActorId(@PathVariable("actorId") Integer actorId) {
         List<Movie> movies = movieRepository.findByActor_Id(actorId);
         if (movies.isEmpty()) {
+            logger.info("No movies found for actor with id {}", actorId);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No movies found for actor with id " + actorId);
         } else {
             String movieDetails = movies.stream()
                     .map(movie -> {
                         String details = "ID: " + movie.getId() + ", Name: " + movie.getName() + ", Language: " + movie.getLanguage();
 
-                        // Add director details
                         if (movie.getDirector() != null) {
                             details += ", Director: " + movie.getDirector().getName();
                         } else {
                             details += ", Director: N/A";
                         }
 
-                        // Add actor details
                         if (movie.getActor() != null) {
                             details += ", Actor: " + movie.getActor().getName();
                         } else {
                             details += ", Actor: N/A";
                         }
 
-                        // Add genre details
                         if (movie.getGenre() != null) {
                             details += ", Genre: " + movie.getGenre().getName();
                         } else {
@@ -314,12 +361,8 @@ public class MovieController {
                     })
                     .collect(Collectors.joining("\n"));
 
+            logger.info("Movies found for actor with id {}: {}", actorId, movieDetails);
             return ResponseEntity.ok(movieDetails);
         }
     }
-
 }
-
-
-
-
