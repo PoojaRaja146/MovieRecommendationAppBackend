@@ -17,7 +17,7 @@ CREATE TRIGGER tr_user_insert
     FOR EACH ROW
 BEGIN
     INSERT INTO user_audit (user_id, operation, operation_time, user_id_audit, old_data, new_data)
-    VALUES (NEW.id, 'INSERT', NOW(), USER(), NULL, CONCAT_WS('|', NEW.id, NEW.email, NEW.name, NEW.created_at, NEW.updated_at));
+    VALUES (NEW.id, 'INSERT', NOW(), USER(), NULL, CONCAT_WS('|', NEW.id, NEW.email, NEW.first_name, NEW.last_name, NEW.created_at, NEW.updated_at));
     END$$
 
     CREATE TRIGGER tr_user_update
@@ -25,7 +25,7 @@ BEGIN
         FOR EACH ROW
     BEGIN
         INSERT INTO user_audit (user_id, operation, operation_time, user_id_audit, old_data, new_data)
-        VALUES (OLD.id, 'UPDATE', NOW(), USER(), CONCAT_WS('|', OLD.id, OLD.email, OLD.name, OLD.created_at, OLD.updated_at), CONCAT_WS('|', NEW.id, NEW.email, NEW.name, NEW.created_at, NEW.updated_at));
+        VALUES (OLD.id, 'UPDATE', NOW(), USER(), CONCAT_WS('|', OLD.id, OLD.email, OLD.first_name, OLD.last_name, OLD.created_at, OLD.updated_at), CONCAT_WS('|', NEW.id, NEW.email, NEW.first_name, NEW.last_name, NEW.created_at, NEW.updated_at));
         END$$
 
         CREATE TRIGGER tr_user_delete
@@ -33,7 +33,7 @@ BEGIN
             FOR EACH ROW
         BEGIN
             INSERT INTO user_audit (user_id, operation, operation_time, user_id_audit, old_data, new_data)
-            VALUES (OLD.id, 'DELETE', NOW(), USER(), CONCAT_WS('|', OLD.id, OLD.email, OLD.name, OLD.created_at, OLD.updated_at), NULL);
+            VALUES (OLD.id, 'DELETE', NOW(), USER(), CONCAT_WS('|', OLD.id, OLD.email, OLD.first_name, OLD.last_name, OLD.created_at, OLD.updated_at), NULL);
             END$$
 
             DELIMITER ;

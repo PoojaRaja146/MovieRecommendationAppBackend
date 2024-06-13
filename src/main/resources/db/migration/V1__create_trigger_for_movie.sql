@@ -15,7 +15,8 @@ CREATE TRIGGER tr_movie_insert
     FOR EACH ROW
 BEGIN
     INSERT INTO movie_audit (movie_id, operation, operation_time, user_id, old_data, new_data)
-    VALUES (NEW.id, 'INSERT', NOW(), user(), NULL, CONCAT_WS('|', NEW.id, NEW.created_at, NEW.language, NEW.name, NEW.updated_at, NEW.actor_id, NEW.director_id, NEW.genre_id));
+    VALUES (NEW.id, 'INSERT', NOW(), user(), NULL, CONCAT_WS('|', NEW.id, NEW.created_at, NEW.language, NEW.name, NEW.updated_at, NEW.actor_id,
+    NEW.director_id, NEW.genre_id));
     END$$
 
 

@@ -17,7 +17,7 @@ CREATE TRIGGER tr_director_insert
     FOR EACH ROW
 BEGIN
     INSERT INTO director_audit (director_id, operation, operation_time, user_id, old_data, new_data)
-    VALUES (NEW.id, 'INSERT', NOW(), USER(), NULL, CONCAT_WS('|', NEW.id, NEW.created_at, NEW.gender, NEW.name, NEW.updated_at));
+    VALUES (NEW.id, 'INSERT', NOW(), USER(), NULL, CONCAT_WS('|', NEW.id, NEW.created_at, NEW.gender, NEW.first_name, NEW.last_name, NEW.updated_at));
 END$$
 
 CREATE TRIGGER tr_director_update
@@ -25,7 +25,7 @@ CREATE TRIGGER tr_director_update
     FOR EACH ROW
 BEGIN
     INSERT INTO director_audit (director_id, operation, operation_time, user_id, old_data, new_data)
-    VALUES (OLD.id, 'UPDATE', NOW(), USER(), CONCAT_WS('|', OLD.id, OLD.created_at, OLD.gender, OLD.name, OLD.updated_at), CONCAT_WS('|', NEW.id, NEW.created_at, NEW.gender, NEW.name, NEW.updated_at));
+    VALUES (OLD.id, 'UPDATE', NOW(), USER(), CONCAT_WS('|', OLD.id, OLD.created_at, OLD.gender, OLD.first_name,OLD.last_name, OLD.updated_at), CONCAT_WS('|', NEW.id, NEW.created_at, NEW.gender, NEW.first_name,NEW.last_name, NEW.updated_at));
 END$$
 
 CREATE TRIGGER tr_director_delete
@@ -33,7 +33,7 @@ CREATE TRIGGER tr_director_delete
     FOR EACH ROW
 BEGIN
     INSERT INTO director_audit (director_id, operation, operation_time, user_id, old_data, new_data)
-    VALUES (OLD.id, 'DELETE', NOW(), USER(), CONCAT_WS('|', OLD.id, OLD.created_at, OLD.gender, OLD.name, OLD.updated_at), NULL);
+    VALUES (OLD.id, 'DELETE', NOW(), USER(), CONCAT_WS('|', OLD.id, OLD.created_at, OLD.gender, OLD.first_name,OLD.last_name, OLD.updated_at), NULL);
 END$$
 
 DELIMITER ;
