@@ -1,7 +1,5 @@
 package sample.server.controller;
 
-import jakarta.validation.ConstraintViolationException;
-import jakarta.validation.ValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -264,13 +262,13 @@ public class MovieController {
                         String details = "ID: " + movie.getId() + ", Name: " + movie.getName() + ", Language: " + movie.getLanguage();
 
                         if (movie.getDirector() != null) {
-                            details += ", Director: " + movie.getDirector().getName();
+                            details += ", Director: " + movie.getDirector().getFirstName() +  " " + movie.getDirector().getLastName();
                         } else {
                             details += ", Director: N/A";
                         }
 
                         if (movie.getActor() != null) {
-                            details += ", Actor: " + movie.getActor().getName();
+                            details += ", Actor: " + movie.getActor().getFirstName() +  " " + movie.getActor().getLastName();
                         } else {
                             details += ", Actor: N/A";
                         }
@@ -302,13 +300,13 @@ public class MovieController {
                         String details = "ID: " + movie.getId() + ", Name: " + movie.getName() + ", Language: " + movie.getLanguage();
 
                         if (movie.getDirector() != null) {
-                            details += ", Director: " + movie.getDirector().getName();
+                            details += ", Director: " + movie.getDirector().getFirstName() +  " " + movie.getDirector().getLastName();
                         } else {
                             details += ", Director: N/A";
                         }
 
                         if (movie.getActor() != null) {
-                            details += ", Actor: " + movie.getActor().getName();
+                            details += ", Actor: " + movie.getActor().getFirstName() +  " " + movie.getActor().getLastName();
                         } else {
                             details += ", Actor: N/A";
                         }
@@ -340,13 +338,13 @@ public class MovieController {
                         String details = "ID: " + movie.getId() + ", Name: " + movie.getName() + ", Language: " + movie.getLanguage();
 
                         if (movie.getDirector() != null) {
-                            details += ", Director: " + movie.getDirector().getName();
+                            details += ", Director: " + movie.getDirector().getFirstName() +  " " + movie.getDirector().getLastName();
                         } else {
                             details += ", Director: N/A";
                         }
 
                         if (movie.getActor() != null) {
-                            details += ", Actor: " + movie.getActor().getName();
+                            details += ", Actor: " + movie.getActor().getFirstName() +  " " + movie.getActor().getLastName();
                         } else {
                             details += ", Actor: N/A";
                         }

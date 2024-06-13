@@ -32,9 +32,10 @@ public class ActorController {
     }
 
     @PostMapping(path="/actors/add")
-    public @ResponseBody String addNewActor(@RequestParam String name, @RequestParam String gender) {
+    public @ResponseBody String addNewActor(@RequestParam String firstName,@RequestParam String lastName,  @RequestParam String gender) {
         Actor actor = new Actor();
-        actor.setName(name);
+        actor.setFirstName(firstName);
+        actor.setLastName(lastName);
         actor.setGender(gender);
         actorRepository.save(actor);
         return "Saved";
@@ -58,12 +59,14 @@ public class ActorController {
     @PutMapping(path="/actors/update/{id}")
     public @ResponseBody String updateActor(
             @PathVariable("id") Integer id,
-            @RequestParam("name") String name,
+            @RequestParam("firstName") String firstName,
+            @RequestParam("lastName") String lastName,
             @RequestParam("gender") String gender
     ) {
         return actorRepository.findById(id)
                 .map(actor -> {
-                    actor.setName(name);
+                    actor.setFirstName(firstName);
+                    actor.setLastName(lastName);
                     actor.setGender(gender);
                     actorRepository.save(actor);
                     return "Updated actor with id " + id;
@@ -72,7 +75,8 @@ public class ActorController {
                     // Optionally add a new actor if not found
                     Actor updatedActor = new Actor();
                     updatedActor.setId(id);
-                    updatedActor.setName(name);
+                    updatedActor.setFirstName(firstName);
+                    updatedActor.setLastName(lastName);
                     updatedActor.setGender(gender);
                     actorRepository.save(updatedActor);
                     return "Created new actor with id " + id;
@@ -84,7 +88,7 @@ public class ActorController {
         Optional<Actor> actorOptional = actorRepository.findById(id);
         if (actorOptional.isPresent()) {
             Actor actor = actorOptional.get();
-            String actorDetails = "ID: " + actor.getId() + ", Name: " + actor.getName() + ", Gender: " + actor.getGender();
+            String actorDetails = "ID: " + actor.getId() + ", First Name: " + actor.getFirstName() + ", Last Name: " + actor.getLastName() + ", Gender: " + actor.getGender();
             return ResponseEntity.ok(actorDetails);
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Actor not found with id " + id);

@@ -1,16 +1,12 @@
 package sample.server.application;
 
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @Entity 
@@ -19,9 +15,13 @@ public class User {
   @GeneratedValue(strategy=GenerationType.AUTO)
   private Integer id;
 
-  private String name;
+  private String firstName;
+
+  private String lastName;
 
   private String email;
+
+  private String phoneNo;
 
   @CreationTimestamp
   private LocalDateTime createdAt;
@@ -37,12 +37,28 @@ public class User {
     this.id = id;
   }
 
-  public String getName() {
-    return name;
+  public String getFirstName() {
+    return firstName;
   }
 
-  public void setName(String name) {
-    this.name = name;
+  public void setFirstName(String firstName) {
+    this.firstName = firstName;
+  }
+
+  public String getLastName() {
+    return lastName;
+  }
+
+  public void setLastName(String lastName) {
+    this.lastName = lastName;
+  }
+
+  public String getPhoneNo() {
+    return phoneNo;
+  }
+
+  public void setPhoneNo(String phoneNo) {
+    this.phoneNo = phoneNo;
   }
 
   public String getEmail() {

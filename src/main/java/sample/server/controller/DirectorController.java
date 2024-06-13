@@ -9,7 +9,6 @@ import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.info.Info;
 import sample.server.application.Director;
-import sample.server.application.User;
 
 import java.util.Optional;
 
@@ -33,9 +32,10 @@ public class DirectorController {
     }
 
     @PostMapping(path="/directors/add")
-    public @ResponseBody String addNewDirector(@RequestParam String name, @RequestParam String gender) {
+    public @ResponseBody String addNewDirector(@RequestParam String firstName, @RequestParam String lastName, @RequestParam String gender) {
         Director director = new Director();
-        director.setName(name);
+        director.setFirstName(firstName);
+        director.setLastName(lastName);
         director.setGender(gender);
         directorRepository.save(director);
         return "Saved";
@@ -59,25 +59,28 @@ public class DirectorController {
     @PutMapping(path="/directors/update/{id}")
     public @ResponseBody String updateDirector(
             @PathVariable("id") Integer id,
-            @RequestParam("name") String name,
+            @RequestParam("firstName") String firstName,
+            @RequestParam("lastName") String lastName,
             @RequestParam("gender") String gender
     ) {
         return directorRepository.findById(id)
                 .map(director -> {
-                    director.setName(name);
+                    director.setFirstName(firstName);
+                    director.setLastName(lastName);
                     director.setGender(gender);
                     directorRepository.save(director);
                     directorRepository.save(director);
-                    return "Updated user with id " + id;
+                    return "Updated Director with id " + id;
                 })
                 .orElseGet(() -> {
                     // Optionally add a new user if not found
                     Director updatedDirector = new Director();
                     updatedDirector.setId(id);
-                    updatedDirector.setName(name);
+                    updatedDirector.setFirstName(firstName);
+                    updatedDirector.setLastName(lastName);
                     updatedDirector.setGender(gender);
                     directorRepository.save(updatedDirector);
-                    return "Created new user with id " + id;
+                    return "Created new Director with id " + id;
                 });
     }
 
@@ -86,10 +89,10 @@ public class DirectorController {
         Optional<Director> directorOptional = directorRepository.findById(id);
         if (directorOptional.isPresent()) {
             Director director = directorOptional.get();
-            String directorDetails = "ID: " + director.getId() + ", Name: " + director.getName() + ", gender: " + director.getGender();
+            String directorDetails = "ID: " + director.getId() + ", First Name: " + director.getFirstName() + ", Last Name: " + director.getLastName() + ", gender: " + director.getGender();
             return ResponseEntity.ok(directorDetails);
         } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found with id " + id);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Director not found with id " + id);
         }
     }
 }
